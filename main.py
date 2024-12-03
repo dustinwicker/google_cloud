@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/Users/dustinwicker/projects/google_cloud')
 import creds
 import os
 from googleapiclient.discovery import build
@@ -12,23 +14,23 @@ if __name__ == "__main__":
     credentials = main()
 
 service = build('sheets', 'v4', credentials=credentials)
-# spreadsheet_id = os.environ.get('GOOGLE_SHEET_PACKING_LIST_ID')
-# range_name = os.environ.get('GOOGLE_SHEET_PACKING_LIST_SHEET_NAME')
-#
-# v = service.spreadsheets().values().get(
-#     spreadsheetId=spreadsheet_id,
-#     range=range_name,
-#     majorDimension='ROWS'  # 'ROWS' or 'COLUMNS'
-# ).execute()
-# values = v.get('values')
-# if values:
-#     last_row = len(values)
-#     last_col = 0
-#     for row in values:
-#         last_col = max(last_col, len(row))
-# second_letter = str.capitalize(chr(ord('a') + last_col-1))
-# range_name = f'Sheet1!A1:{second_letter}{79}'
-# sheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id,
+spreadsheet_id = os.environ.get('GOOGLE_SHEET_CREDIT_CARDS')
+range_name = os.environ.get('GOOGLE_SHEET_SHEET_ONE')
+
+v = service.spreadsheets().values().get(
+    spreadsheetId=spreadsheet_id,
+    range=range_name,
+    majorDimension='ROWS'  # 'ROWS' or 'COLUMNS'
+).execute()
+values = v.get('values')
+if values:
+    last_row = len(values)
+    last_col = 0
+    for row in values:
+         last_col = max(last_col, len(row))
+second_letter = str.capitalize(chr(ord('a') + last_col-1))
+range_name = f'Sheet1!A1:{second_letter}{79}'
+sheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id,
 #                                             ranges=range_name,
 #                                             includeGridData=True).execute()
 # sheets = sheet.get('sheets')
