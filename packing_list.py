@@ -1,5 +1,4 @@
-import sys
-sys.path.append('/Users/dustinwicker/projects/google_cloud')
+#!/usr/bin/env python3
 import creds
 import os
 from googleapiclient.discovery import build
@@ -46,11 +45,20 @@ def get_packing_list(spreadsheet_id: str, range_name: str):
 
 
 def get_remaining_items_from_packing_list(packing_list: list):
+    """
+    Get the remaining items from the packing list.
+    """
+    remaining_items = []
     for row in packing_list:
         values = row.get('values', [])
         if not values[0].get('userEnteredFormat').get('textFormat').get('strikethrough'):
             value = values[0].get('userEnteredValue')
-            print(value.get('stringValue'))
+            remaining_items.append(value.get('stringValue'))
+    # remaining_items.sort()
+    percentage = (len(remaining_items) / len(packing_list)) * 100 if packing_list else 0
+    print(f'Number of remaining items/tasks: {len(remaining_items)} out of {len(packing_list)} ({percentage:.0f}%)', end='\n\n')
+    for item in remaining_items:
+        print(item)
 
 
 if __name__ == "__main__":
@@ -58,4 +66,5 @@ if __name__ == "__main__":
     service = build('sheets', 'v4', credentials=credentials)
     spreadsheet_id, range_name = os.environ.get('GOOGLE_SHEET_PACKING_LIST_ID'), os.environ.get('GOOGLE_SHEET_SHEET_ONE')
     packing_list = get_packing_list(spreadsheet_id, range_name)
-    get_remaining_items_from_packing_list(packing_list)
+    if len(packing_list) > 0:
+        get_remaining_items_from_packing_list(packing_list)
