@@ -44,19 +44,31 @@ def get_packing_list(spreadsheet_id: str, range_name: str):
     return packing_list
 
 
-def get_remaining_items_from_packing_list(packing_list: list):
-    """
-    Get the remaining items from the packing list.
-    """
+def get_remaining_items_from_packing_list(packing_list):
     remaining_items = []
+
     for row in packing_list:
-        values = row.get('values', [])
-        if not values[0].get('userEnteredFormat').get('textFormat').get('strikethrough'):
-            value = values[0].get('userEnteredValue')
-            remaining_items.append(value.get('stringValue'))
-    # remaining_items.sort()
+        values = row.get("values", [])
+        if not values:
+            continue
+
+        cell = values[0] or {}
+
+        text_format = ((cell.get("userEnteredFormat") or {}).get("textFormat") or {})
+        is_struck = bool(text_format.get("strikethrough", False))
+
+        if not is_struck:
+            user_value = cell.get("userEnteredValue") or {}
+            item = user_value.get("stringValue")
+            if item is None:
+                # fallback if value is numeric/bool/etc.
+                item = next(iter(user_value.values()), None)
+
+            if item is not None:
+                remaining_items.append(item)
+
     percentage = (len(remaining_items) / len(packing_list)) * 100 if packing_list else 0
-    print(f'Number of remaining items/tasks: {len(remaining_items)} out of {len(packing_list)} ({percentage:.0f}%)', end='\n\n')
+    print(f'\nNumber of remaining items/tasks: {len(remaining_items)} out of {len(packing_list)} ({percentage:.0f}%)', end='\n\n')
     for item in remaining_items:
         print(item)
 

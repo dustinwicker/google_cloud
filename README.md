@@ -6,6 +6,7 @@ Python utilities for interacting with Google Cloud services, specifically Google
 
 - **Google Sheets Integration** - Read and parse data from Google Sheets
 - **Packing List Parser** - Retrieves items from a packing list spreadsheet, filtering out strikethrough (completed) items
+- **Food Sheet Reader** - Dumps tabular data from a Google Sheet as CSV to stdout (same auth as the packing list)
 - **Credit Card Tracker** - Calculates and updates monthly totals for non-strikethrough credit card expenses
 - **Service Account Authentication** - Secure authentication using Google service account credentials
 
@@ -35,17 +36,33 @@ Set the following environment variables:
 ```bash
 export GOOGLE_SERVICE_ACCOUNT="/path/to/service-account-credentials.json"
 export GOOGLE_SHEET_PACKING_LIST_ID="your-spreadsheet-id"
-export GOOGLE_SHEET_SHEET_ONE="Sheet1!A1:Z100"
+export GOOGLE_SHEET_SHEET_ONE='Sheet1!A1:Z100'
+
+# Optional: food / nutrition tracker sheet (use single quotes — zsh treats ! as history)
+export GOOGLE_SHEET_FOOD_ID='your-spreadsheet-id'
+export GOOGLE_SHEET_FOOD_RANGE='Log!A1:Z5000'
 ```
 
 ## Usage
+
+### Food sheet reader
+
+Reads the configured range and prints CSV to stdout (redirect to a file if you want):
+
+```bash
+python read_food_sheet.py > food_export.csv
+```
+
+Default tab is **`Log`**. Set `GOOGLE_SHEET_FOOD_RANGE` to read another tab (e.g. `'Custom Recipes!A1:Z5000'`). In **zsh**, quote the value so `!` is not history-expanded.
+
+If you see **403**, open the sheet → **Share** → add the **`client_email`** from your service account JSON (same address you used for the packing list spreadsheet).
 
 ### Packing List Script
 
 Retrieves remaining (non-strikethrough) items from a Google Sheets packing list:
 
 ```bash
-python packing_list.py
+python3 packing_list.py
 ```
 
 The script will:
